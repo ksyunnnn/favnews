@@ -1,26 +1,25 @@
-import React from 'react';
-import logo from './logo.svg';
-import './App.css';
+import React, { useEffect, useState } from 'react';
+import { BrowserRouter as Router, Route } from 'react-router-dom';
 
-function App() {
+import { baseUrl, ArticlesContext } from './state';
+import ArticleDetail from './components/ArticleDetail';
+import ArticleList from './components/ArticleList';
+
+export default () => {
+  const [articles, setArticles] = useState([]);
+  const fetchData = async () => fetch(baseUrl)
+    .then((response) => {
+      response.json().then(value => setArticles(value.articles));
+    });
+  useEffect(() => {
+    fetchData();
+  }, []);
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
+    <ArticlesContext.Provider value={articles}>
+      <Router>
+        <Route exact path="/" component={ArticleList} />
+        <Route path="/article/:title" component={ArticleDetail} />
+      </Router>
+    </ArticlesContext.Provider>
   );
-}
-
-export default App;
+};
